@@ -33,15 +33,40 @@ restore the previous layout.
 
 ## Installation
 
-Release binaries are not published yet. To build and run the project locally,
-install Go and run:
+### Quick install (Linux, macOS)
+
+1. Install (or update to the latest version):
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/EugenePixelpelx/lazydocker2/master/scripts/install.sh | sh
+   ```
+
+2. Run:
+
+   ```bash
+   lazydocker2
+   ```
+
+That's it. The script detects your OS and CPU, downloads the latest release and
+puts `lazydocker2` into `/usr/local/bin` (asking for your `sudo` password if
+needed). Run the same command again to update.
+
+### Other platforms
+
+Binaries for all platforms, including Windows, are available on the
+[Releases](https://github.com/EugenePixelpelx/lazydocker2/releases) page.
+
+`lazydocker2` reads the same config file as lazydocker, and both can be installed
+side by side.
+
+### Building from source
+
+Install Go and run:
 
 ```bash
 GOFLAGS=-mod=vendor go build -o lazydocker2 .
 ./lazydocker2
 ```
-
-Published release binaries and installation instructions will be added here.
 
 ## Documentation
 
