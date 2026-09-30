@@ -66,6 +66,7 @@ func (gui *Gui) getWindowDimensions(informationStr string, appStatus string) map
 
 func (gui *Gui) getMidSectionWeights() (int, int) {
 	currentWindow := gui.currentStaticWindowName()
+	mainPanelContextActive := currentWindow == "main" || gui.filterTargetView() == gui.Views.Main
 
 	// we originally specified this as a ratio i.e. .20 would correspond to a weight of 1 against 4
 	sidePanelWidthRatio := gui.Config.UserConfig.Gui.SidePanelWidth
@@ -73,7 +74,7 @@ func (gui *Gui) getMidSectionWeights() (int, int) {
 	mainSectionWeight := int(1/sidePanelWidthRatio) - 1
 	sideSectionWeight := 1
 
-	if currentWindow == "main" && gui.State.ScreenMode == SCREEN_FULL {
+	if mainPanelContextActive && gui.State.ScreenMode == SCREEN_FULL {
 		mainSectionWeight = 1
 		sideSectionWeight = 0
 	} else {

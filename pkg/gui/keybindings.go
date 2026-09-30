@@ -438,6 +438,18 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 			Description: gui.Tr.Return,
 		},
 		{
+			ViewName: "main",
+			Key:      gocui.KeyTab,
+			Modifier: gocui.ModNone,
+			Handler:  gui.handleNextViewFromMain,
+		},
+		{
+			ViewName: "main",
+			Key:      gocui.KeyBacktab,
+			Modifier: gocui.ModNone,
+			Handler:  gui.handlePreviousViewFromMain,
+		},
+		{
 			ViewName:    "main",
 			Key:         '/',
 			Modifier:    gocui.ModNone,
@@ -473,6 +485,13 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 			Key:      'l',
 			Modifier: gocui.ModNone,
 			Handler:  gui.scrollRightMain,
+		},
+		{
+			ViewName:    "main",
+			Key:         'z',
+			Modifier:    gocui.ModNone,
+			Handler:     wrappedHandler(gui.toggleMainPanelFullscreen),
+			Description: gui.Tr.ToggleMainPanelFullscreen,
 		},
 		{
 			ViewName: "filter",

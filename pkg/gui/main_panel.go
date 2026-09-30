@@ -74,7 +74,6 @@ func (gui *Gui) jumpToTopMain(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (gui *Gui) onMainTabClick(tabIndex int) error {
-	gui.Log.Warn(tabIndex)
 	if err := gui.clearMainSearch(); err != nil {
 		return err
 	}
@@ -82,6 +81,12 @@ func (gui *Gui) onMainTabClick(tabIndex int) error {
 	currentSidePanel, ok := gui.currentSidePanel()
 	if !ok && gui.Views.Main.ParentView != nil {
 		currentSidePanel, ok = gui.sidePanelForView(gui.Views.Main.ParentView)
+	}
+	if !ok {
+		currentSideView, err := gui.g.View(gui.currentSideViewName())
+		if err == nil {
+			currentSidePanel, ok = gui.sidePanelForView(currentSideView)
+		}
 	}
 
 	if !ok {
@@ -105,8 +110,28 @@ func (gui *Gui) handleEnterMain(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (gui *Gui) handleExitMain(g *gocui.Gui, v *gocui.View) error {
+	if gui.State.MainPanelFullscreen {
+		return gui.toggleMainPanelFullscreen()
+	}
+
 	v.ParentView = nil
 	return gui.returnFocus()
+}
+
+func (gui *Gui) handleNextViewFromMain(g *gocui.Gui, v *gocui.View) error {
+	if gui.State.MainPanelFullscreen {
+		return nil
+	}
+
+	return gui.nextView(g, v.ParentView)
+}
+
+func (gui *Gui) handlePreviousViewFromMain(g *gocui.Gui, v *gocui.View) error {
+	if gui.State.MainPanelFullscreen {
+		return nil
+	}
+
+	return gui.previousView(g, v.ParentView)
 }
 
 func (gui *Gui) handleMainClick() error {

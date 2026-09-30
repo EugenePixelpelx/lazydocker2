@@ -245,6 +245,8 @@ func (v *View) GetSearchStatus() (int, int) {
 func (v *View) Search(str string) error {
 	v.writeMutex.Lock()
 	v.searcher.search(str)
+	maxX, _ := v.Size()
+	v.refreshViewLines(maxX)
 	v.updateSearchPositions()
 
 	if len(v.searcher.searchPositions) > 0 {
@@ -276,7 +278,7 @@ func (v *View) IsSearching() bool {
 }
 
 func (v *View) FocusPoint(cx int, cy int) {
-	lineCount := len(v.lines)
+	lineCount := len(v.viewLines)
 	if cy < 0 || cy > lineCount {
 		return
 	}
@@ -958,7 +960,8 @@ func (v *View) updateSearchPositions() {
 		}
 
 		v.searcher.searchPositions = []cellPos{}
-		for y, line := range v.lines {
+		for y, viewLine := range v.viewLines {
+			line := viewLine.line
 			x := 0
 			for startIdx, c := range line {
 				found := true
@@ -999,7 +1002,6 @@ func (v *View) draw() error {
 
 	v.clearRunes()
 
-	v.updateSearchPositions()
 	maxX, maxY := v.Size()
 
 	if v.Wrap {
@@ -1008,34 +1010,8 @@ func (v *View) draw() error {
 		}
 		v.ox = 0
 	}
-	if v.tainted {
-		lineIdx := 0
-		lines := v.lines
-		if v.HasLoader {
-			lines = v.loaderLines()
-		}
-		for i, line := range lines {
-			wrap := 0
-			if v.Wrap {
-				wrap = maxX
-			}
-
-			ls := lineWrap(line, wrap)
-			for j := range ls {
-				vline := viewLine{linesX: j, linesY: i, line: ls[j]}
-
-				if lineIdx > len(v.viewLines)-1 {
-					v.viewLines = append(v.viewLines, vline)
-				} else {
-					v.viewLines[lineIdx] = vline
-				}
-				lineIdx++
-			}
-		}
-		if !v.HasLoader {
-			v.tainted = false
-		}
-	}
+	v.refreshViewLines(maxX)
+	v.updateSearchPositions()
 
 	visibleViewLinesHeight := v.viewLineLengthIgnoringTrailingBlankLines()
 	if v.Autoscroll && visibleViewLinesHeight > maxY {
@@ -1122,6 +1098,42 @@ func (v *View) draw() error {
 		}
 	}
 	return nil
+}
+
+// refreshViewLines updates the representation that is actually rendered. Search
+// positions must use these lines rather than the source lines because wrapping
+// changes both the row and column of a match.
+func (v *View) refreshViewLines(maxX int) {
+	if !v.tainted {
+		return
+	}
+
+	lineIdx := 0
+	lines := v.lines
+	if v.HasLoader {
+		lines = v.loaderLines()
+	}
+	for i, line := range lines {
+		wrap := 0
+		if v.Wrap {
+			wrap = maxX
+		}
+
+		ls := lineWrap(line, wrap)
+		for j := range ls {
+			vline := viewLine{linesX: j, linesY: i, line: ls[j]}
+
+			if lineIdx > len(v.viewLines)-1 {
+				v.viewLines = append(v.viewLines, vline)
+			} else {
+				v.viewLines[lineIdx] = vline
+			}
+			lineIdx++
+		}
+	}
+	if !v.HasLoader {
+		v.tainted = false
+	}
 }
 
 // if autoscroll is enabled but we only have a single row of cells shown to the

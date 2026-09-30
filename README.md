@@ -16,10 +16,15 @@ fixes available independently of upstream releases.
 - Search and filter prompts identify their target, and the corresponding panel
   remains visually active.
 - Clicking another panel or switching tabs clears the current main-panel search.
+- The main panel has a predictable fullscreen toggle for focused viewing and
+  easier terminal text selection.
 
 `/` is contextual: it filters the focused side panel or searches the focused main
 tab. Press `Enter` to confirm a search and move to the next result, `n`/`N` to move
 forward/backward, and `Esc` to clear it.
+
+Press `z` while the main panel is focused to enter fullscreen, and `z` again to
+restore the previous layout.
 
 ## Requirements
 

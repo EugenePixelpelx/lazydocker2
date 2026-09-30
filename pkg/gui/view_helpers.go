@@ -290,6 +290,8 @@ func (gui *Gui) handleClickAux(v *gocui.View, itemCount int, selectedLine *int, 
 }
 
 func (gui *Gui) nextScreenMode() error {
+	gui.State.MainPanelFullscreen = false
+
 	if gui.currentViewName() == "main" {
 		gui.State.ScreenMode = prevIntInCycle([]WindowMaximisation{SCREEN_NORMAL, SCREEN_HALF, SCREEN_FULL}, gui.State.ScreenMode)
 
@@ -302,6 +304,8 @@ func (gui *Gui) nextScreenMode() error {
 }
 
 func (gui *Gui) prevScreenMode() error {
+	gui.State.MainPanelFullscreen = false
+
 	if gui.currentViewName() == "main" {
 		gui.State.ScreenMode = nextIntInCycle([]WindowMaximisation{SCREEN_NORMAL, SCREEN_HALF, SCREEN_FULL}, gui.State.ScreenMode)
 
@@ -310,6 +314,27 @@ func (gui *Gui) prevScreenMode() error {
 
 	gui.State.ScreenMode = prevIntInCycle([]WindowMaximisation{SCREEN_NORMAL, SCREEN_HALF, SCREEN_FULL}, gui.State.ScreenMode)
 
+	return nil
+}
+
+func (gui *Gui) toggleMainPanelFullscreen() error {
+	if gui.State.MainPanelFullscreen {
+		gui.State.ScreenMode = gui.State.PreviousScreenMode
+		gui.State.MainPanelFullscreen = false
+		return nil
+	}
+
+	// If fullscreen was entered through the legacy screen-mode controls or the
+	// startup configuration, make z behave like a predictable toggle back to the
+	// normal layout. The next z press will enter the dedicated fullscreen mode.
+	if gui.State.ScreenMode == SCREEN_FULL {
+		gui.State.ScreenMode = SCREEN_NORMAL
+		return nil
+	}
+
+	gui.State.PreviousScreenMode = gui.State.ScreenMode
+	gui.State.ScreenMode = SCREEN_FULL
+	gui.State.MainPanelFullscreen = true
 	return nil
 }
 

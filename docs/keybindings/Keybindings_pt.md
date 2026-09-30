@@ -99,6 +99,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 <pre>
   <kbd>esc</kbd>: retornar
   <kbd>/</kbd>: search
+  <kbd>z</kbd>: toggle main panel fullscreen
 </pre>
 
 ## Global

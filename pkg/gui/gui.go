@@ -84,6 +84,12 @@ type guiState struct {
 
 	ScreenMode WindowMaximisation
 
+	// MainPanelFullscreen tracks the dedicated main-panel fullscreen toggle.
+	// PreviousScreenMode lets us restore the exact layout that was active before
+	// entering fullscreen (normal or half).
+	MainPanelFullscreen bool
+	PreviousScreenMode  WindowMaximisation
+
 	// Maintains the state of manual filtering i.e. typing in a substring
 	// to filter on in the current panel.
 	Filter filterState
