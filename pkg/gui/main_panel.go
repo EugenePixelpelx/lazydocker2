@@ -77,6 +77,9 @@ func (gui *Gui) onMainTabClick(tabIndex int) error {
 	gui.Log.Warn(tabIndex)
 
 	currentSidePanel, ok := gui.currentSidePanel()
+	if !ok && gui.Views.Main.ParentView != nil {
+		currentSidePanel, ok = gui.sidePanelForView(gui.Views.Main.ParentView)
+	}
 
 	if !ok {
 		return nil

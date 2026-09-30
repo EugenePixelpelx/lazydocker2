@@ -27,9 +27,18 @@ func (gui *Gui) getFocusLayout() func(g *gocui.Gui) error {
 func (gui *Gui) onFocusChange() error {
 	currentView := gui.g.CurrentView()
 	for _, view := range gui.g.Views() {
-		view.Highlight = view == currentView && view.Name() != "main"
+		view.Highlight = gui.shouldHighlightView(view, currentView)
 	}
 	return nil
+}
+
+func (gui *Gui) shouldHighlightView(view *gocui.View, currentView *gocui.View) bool {
+	if currentView == nil {
+		return false
+	}
+
+	return view == currentView && view != gui.Views.Main ||
+		currentView == gui.Views.Main && currentView.ParentView == view
 }
 
 func (gui *Gui) onFocusLost(v *gocui.View, newView *gocui.View) {

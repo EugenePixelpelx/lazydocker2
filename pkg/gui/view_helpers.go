@@ -338,10 +338,16 @@ func (gui *Gui) CurrentView() *gocui.View {
 }
 
 func (gui *Gui) currentSidePanel() (panels.ISideListPanel, bool) {
-	viewName := gui.currentViewName()
+	return gui.sidePanelForView(gui.CurrentView())
+}
+
+func (gui *Gui) sidePanelForView(view *gocui.View) (panels.ISideListPanel, bool) {
+	if view == nil {
+		return nil, false
+	}
 
 	for _, sidePanel := range gui.allSidePanels() {
-		if sidePanel.GetView().Name() == viewName {
+		if sidePanel.GetView() == view {
 			return sidePanel, true
 		}
 	}
