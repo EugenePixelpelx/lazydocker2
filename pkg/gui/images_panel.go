@@ -112,7 +112,7 @@ func (gui *Gui) refreshStateImages() error {
 }
 
 func (gui *Gui) FilterString(view *gocui.View) string {
-	if gui.State.Filter.panel != nil && gui.State.Filter.panel.GetView() != view {
+	if gui.State.Filter.panel == nil || gui.State.Filter.panel.GetView() != view {
 		return ""
 	}
 

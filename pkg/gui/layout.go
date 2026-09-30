@@ -26,8 +26,13 @@ func (gui *Gui) getFocusLayout() func(g *gocui.Gui) error {
 
 func (gui *Gui) onFocusChange() error {
 	currentView := gui.g.CurrentView()
+	filterTargetView := gui.filterTargetView()
 	for _, view := range gui.g.Views() {
 		view.Highlight = gui.shouldHighlightView(view, currentView)
+		view.FrameColor = gui.g.FrameColor
+		if currentView == gui.Views.Filter && view == filterTargetView {
+			view.FrameColor = gui.g.SelFrameColor
+		}
 	}
 	return nil
 }
@@ -37,8 +42,15 @@ func (gui *Gui) shouldHighlightView(view *gocui.View, currentView *gocui.View) b
 		return false
 	}
 
-	return view == currentView && view != gui.Views.Main ||
-		currentView == gui.Views.Main && currentView.ParentView == view
+	focusContextView := currentView
+	if currentView == gui.Views.Filter && gui.filterTargetView() != nil {
+		focusContextView = gui.filterTargetView()
+	}
+
+	mainContextFocused := focusContextView == gui.Views.Main
+
+	return view == focusContextView && view != gui.Views.Main ||
+		mainContextFocused && gui.Views.Main.ParentView == view
 }
 
 func (gui *Gui) onFocusLost(v *gocui.View, newView *gocui.View) {
@@ -46,7 +58,10 @@ func (gui *Gui) onFocusLost(v *gocui.View, newView *gocui.View) {
 		return
 	}
 
-	if !gui.isPopupPanel(newView.Name()) {
+	// The filter view is a transient input belonging to the previously focused view.
+	// Keep that view's parent so main-panel search can return without losing its
+	// associated side panel.
+	if !gui.isPopupPanel(newView.Name()) && newView != gui.Views.Filter {
 		v.ParentView = nil
 	}
 

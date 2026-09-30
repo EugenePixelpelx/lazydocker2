@@ -438,6 +438,19 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 			Description: gui.Tr.Return,
 		},
 		{
+			ViewName:    "main",
+			Key:         '/',
+			Modifier:    gocui.ModNone,
+			Handler:     wrappedHandler(gui.handleOpenMainSearch),
+			Description: gui.Tr.SearchPrompt,
+		},
+		{
+			ViewName: "main",
+			Key:      'n',
+			Modifier: gocui.ModNone,
+			Handler:  wrappedHandler(gui.selectNextMainSearchResult),
+		},
+		{
 			ViewName: "main",
 			Key:      gocui.KeyArrowLeft,
 			Modifier: gocui.ModNone,
@@ -602,6 +615,9 @@ func (gui *Gui) keybindings(g *gocui.Gui) error {
 	if err := g.SetTabClickBinding("main", gui.onMainTabClick); err != nil {
 		return err
 	}
+
+	g.OnSearchEscape = gui.clearMainSearch
+	g.NextSearchMatchKey = gocui.KeyEnter
 
 	return nil
 }

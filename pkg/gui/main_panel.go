@@ -75,6 +75,9 @@ func (gui *Gui) jumpToTopMain(g *gocui.Gui, v *gocui.View) error {
 
 func (gui *Gui) onMainTabClick(tabIndex int) error {
 	gui.Log.Warn(tabIndex)
+	if err := gui.clearMainSearch(); err != nil {
+		return err
+	}
 
 	currentSidePanel, ok := gui.currentSidePanel()
 	if !ok && gui.Views.Main.ParentView != nil {
@@ -86,7 +89,12 @@ func (gui *Gui) onMainTabClick(tabIndex int) error {
 	}
 
 	currentSidePanel.SetMainTabIndex(tabIndex)
-	return currentSidePanel.HandleSelect()
+	if err := currentSidePanel.HandleSelect(); err != nil {
+		return err
+	}
+
+	gui.Views.Main.ParentView = currentSidePanel.GetView()
+	return gui.switchFocus(gui.Views.Main)
 }
 
 func (gui *Gui) handleEnterMain(g *gocui.Gui, v *gocui.View) error {

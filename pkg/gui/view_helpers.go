@@ -250,6 +250,10 @@ func (gui *Gui) clearMainView() {
 }
 
 func (gui *Gui) HandleClick(v *gocui.View, itemCount int, selectedLine *int, handleSelect func() error) error {
+	if err := gui.clearMainSearch(); err != nil {
+		return err
+	}
+
 	wrappedHandleSelect := func(g *gocui.Gui, v *gocui.View) error {
 		return handleSelect()
 	}

@@ -95,6 +95,8 @@ type filterState struct {
 	active bool
 	// The panel that we're filtering.
 	panel panels.ISideListPanel
+	// The view whose contents we're searching. This is mutually exclusive with panel.
+	searchView *gocui.View
 	// The string that we're filtering on
 	needle string
 }
@@ -452,6 +454,10 @@ func (gui *Gui) handleCustomCommand(g *gocui.Gui, v *gocui.View) error {
 func (gui *Gui) ShouldRefresh(key string) bool {
 	if gui.State.Panels.Main.ObjectKey == key {
 		return false
+	}
+
+	if err := gui.clearMainSearch(); err != nil {
+		gui.Log.Error(err)
 	}
 
 	gui.State.Panels.Main.ObjectKey = key
